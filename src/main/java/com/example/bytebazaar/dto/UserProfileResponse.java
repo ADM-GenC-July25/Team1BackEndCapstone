@@ -1,13 +1,13 @@
 package com.example.bytebazaar.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.example.bytebazaar.model.User;
 
 public class UserProfileResponse {
     private String username;
     private String accessLevel;
-    private String token;
     private long userId;
     private String firstName;
     private String lastName;
@@ -21,6 +21,7 @@ public class UserProfileResponse {
     private String country;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Date dateOfBirth; // Assuming you have a Date class for dateOfBirth
     public UserProfileResponse() {
         // Default constructor
     }
@@ -38,13 +39,13 @@ public class UserProfileResponse {
         this.state = user.getState();
         this.zipCode = user.getZipCode();
         this.country = user.getCountry();
+        this.setDateOfBirth(user.getDateOfBirth()); // Assuming User has a dateOfBirth field
         this.createdAt = LocalDateTime.now(); // Assuming createdAt is set to current time
         this.updatedAt = LocalDateTime.now(); // Assuming updatedAt is set to current time
     }
 
     // Constructor expected by AuthController
-    public UserProfileResponse(String token, String username, String email, String accessLevel) {
-        this.token = token;
+    public UserProfileResponse(String username, String email, String accessLevel) {
         this.username = username;
         this.email = email;
         this.accessLevel = accessLevel;
@@ -67,13 +68,7 @@ public class UserProfileResponse {
         this.accessLevel = accessLevel;
     }
 
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
+   
 
     public long getUserId() {
         return userId;
@@ -178,4 +173,10 @@ public class UserProfileResponse {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+	public Date getDateOfBirth() {
+		return dateOfBirth;
+	}
+	public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
 }

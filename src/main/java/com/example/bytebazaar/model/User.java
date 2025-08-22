@@ -1,5 +1,5 @@
 package com.example.bytebazaar.model;
-import java.time.LocalDateTime;
+import java.time.LocalDateTime;	
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -12,6 +12,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Date;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.*;
 
@@ -38,6 +41,7 @@ public class User implements UserDetails {
     private String zipCode;
     private String country;
     private String accessLevel; // e.g., "USER", "ADMIN"
+    private Date dateOfBirth; // Assuming you have a Date class for dateOfBirth
     
     @Column(unique = true, nullable = false)
     private String username;
@@ -207,5 +211,13 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+	public Date getDateOfBirth() {
+		// TODO Auto-generated method stub
+		return dateOfBirth;
+	}
+
+	public void setDateOfBirth(Date dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
+	}
 
 }

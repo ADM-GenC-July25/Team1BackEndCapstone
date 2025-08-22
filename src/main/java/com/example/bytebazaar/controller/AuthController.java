@@ -1,24 +1,25 @@
 package com.example.bytebazaar.controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import com.example.bytebazaar.model.User;
-import com.example.bytebazaar.service.AuthService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.bytebazaar.dto.LoginRequest;
 import com.example.bytebazaar.dto.LoginResponse;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import com.example.bytebazaar.dto.RegistrationResponse;
 import com.example.bytebazaar.dto.UserProfileResponse;
+import com.example.bytebazaar.model.User;
+import com.example.bytebazaar.service.AuthService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
@@ -51,8 +52,8 @@ public class AuthController {
                     );
             } else {
                 // It's already a username
-            	response = authService.loginWithEmail(
-                        this.authService.getUserByUsername(usernameOrEmail).getEmail(), 
+            	response = authService.loginWithUsername(
+                        usernameOrEmail, 
                         loginRequest.getPassword()
                     );
             }
@@ -62,29 +63,21 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-    @PutMapping("/update/{userId}")
+    @PutMapping("/update")
     @Operation(summary = "Update user profile", description = "Update user profile information")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "User successfully updated"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - cannot update other user's profile"),
         @ApiResponse(responseCode = "404", description = "User not found"),
         @ApiResponse(responseCode = "400", description = "Invalid data provided")
     })
-    public ResponseEntity<UserProfileResponse> updateUser(@PathVariable long userId, @RequestBody User user, Authentication authentication) {
+    public ResponseEntity<UserProfileResponse> updateUser(@RequestBody User user, Authentication authentication) {
         try {
-            // Check if user is admin or updating their own profile
-            boolean isAdmin = authentication.getAuthorities().stream()
-                    .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+            // Get the current user from the authentication token
+            String username = authentication.getName();
+            User currentUser = authService.getUserByUsername(username);
             
-            if (!isAdmin) {
-                // Non-admin users can only update their own profile
-                User currentUser = authService.getUserByUsername(authentication.getName());
-                if (!currentUser.getUserId().equals(userId)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-                }
-            }
-            
-            User updatedUser = authService.updateUser(userId, user);
+            // Use the current user's ID for the update
+            User updatedUser = authService.updateUser(currentUser.getUserId(), user);
             UserProfileResponse response = new UserProfileResponse(updatedUser);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
