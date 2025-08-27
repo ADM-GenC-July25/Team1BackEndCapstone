@@ -1,12 +1,14 @@
 package com.example.bytebazaar.service;
-import com.example.bytebazaar.model.User;
-import com.example.bytebazaar.repository.UserRepository;
-import com.example.bytebazaar.dto.LoginResponse;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import java.util.Optional;
+import org.springframework.stereotype.Service;
+
+import com.example.bytebazaar.dto.LoginResponse;
+import com.example.bytebazaar.model.User;
+import com.example.bytebazaar.repository.UserRepository;
 
 @Service
 public class AuthService {
@@ -54,15 +56,20 @@ public class AuthService {
     public LoginResponse loginWithEmail(String email, String password) {
         // Authenticate the user
     	System.out.println("Got to authentication manager" + email);
+        User user;
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isPresent()) {
+        	user = userOptional.get();
+        } else {
+        	throw new RuntimeException("User not found");
+        }
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(email, password)
+            new UsernamePasswordAuthenticationToken(user.getUsername(), password)
         );
         
         
         // If authentication successful, generate JWT token and return user info
-        Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
             String token = jwtService.generateToken(user);
             
             return new LoginResponse(
