@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -75,6 +76,9 @@ public class SecurityConfig {
                 .permitAll()
                 // Allow auth endpoints for testing
                 .requestMatchers("/auth/register", "/auth/login")
+                .permitAll()
+                // Allow GET requests to products (public browsing)
+                .requestMatchers(HttpMethod.GET, "/api/products/**")
                 .permitAll()
                 .anyRequest().authenticated()
             )
