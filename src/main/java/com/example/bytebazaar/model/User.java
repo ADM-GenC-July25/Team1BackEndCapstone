@@ -19,7 +19,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "BBUsers")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
     /**
