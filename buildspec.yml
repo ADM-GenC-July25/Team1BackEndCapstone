@@ -4,7 +4,6 @@ phases:
   install:
     runtime-versions:
       java: corretto17
-      docker: 20
     commands:
       - echo Entered the install phase...
       - echo Installing Maven...
@@ -15,33 +14,31 @@ phases:
     commands:
       - echo Entered the pre_build phase...
       - echo Build started on `date`
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo Listing source code files...
+      - ls -la
   
   build:
     commands:
       - echo Entered the build phase...
       - echo Build started on `date`
       - mvn clean package -DskipTests
-      - echo Building Docker image...
-      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Build completed successfully
+      - ls -la target/
   
   post_build:
     commands:
       - echo Entered the post_build phase...
       - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Verifying JAR file exists...
+      - ls -la target/*.jar
 
 artifacts:
   files:
-    - target/*.jar
-    - Dockerfile
-    - appspec.yml
-    - scripts/**/*
+    - target/ByteBazaar-0.0.1-SNAPSHOT.jar
   name: ByteBazaar-$(date +%Y-%m-%d-%H-%M-%S)
   
 cache:
   paths:
     - '/root/.m2/**/*'
+
+
