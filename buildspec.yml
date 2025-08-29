@@ -1,0 +1,41 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo Entered the install phase...
+      - echo Installing Maven...
+      - apt-get update -y
+      - apt-get install -y maven
+  
+  pre_build:
+    commands:
+      - echo Entered the pre_build phase...
+      - echo Build started on `date`
+      - echo Listing directory contents
+      - ls -la
+  
+  build:
+    commands:
+      - echo Entered the build phase...
+      - echo Build started on `date`
+      - mvn clean compile test package
+  
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - echo Build completed on `date`
+      - ls -la target/
+
+artifacts:
+  files:
+    - target/*.jar
+    - appspec.yml
+    - scripts/**/*
+  name: ByteBazaar-$(date +%Y-%m-%d-%H-%M-%S)
+  
+cache:
+  paths:
+    - '/root/.m2/**/*'
