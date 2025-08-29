@@ -1,42 +1,20 @@
 version: 0.2
-
 phases:
   install:
     runtime-versions:
       java: corretto17
-    commands:
-      - echo Entered the install phase...
-      - echo Installing Maven...
-      - yum update -y
-      - yum install -y maven
-  
   pre_build:
     commands:
-      - echo Entered the pre_build phase...
-      - echo Build started on `date`
-      - echo Listing source code files...
-      - ls -la
-  
+      - echo In the pre_build phase...
+      - mvn test
   build:
     commands:
-      - echo Entered the build phase...
       - echo Build started on `date`
-      - mvn clean package -DskipTests
-      - echo Build completed successfully
-      - ls -la target/
-  
+      - mvn package
   post_build:
     commands:
-      - echo Entered the post_build phase...
       - echo Build completed on `date`
-      - echo Verifying JAR file exists...
-      - ls -la target/*.jar
-
 artifacts:
   files:
-    - target/ByteBazaar-0.0.1-SNAPSHOT.jar
-  name: ByteBazaar-$(date +%Y-%m-%d-%H-%M-%S)
-  
-cache:
-  paths:
-    - '/root/.m2/**/*'
+    - target/*.jar
+  discard-paths: yes
