@@ -4,14 +4,11 @@ phases:
   install:
     runtime-versions:
       java: corretto17
-      docker: 20
     commands:
       - echo Entered the install phase...
       - echo Installing Maven...
       - apt-get update -y
       - apt-get install -y maven
-      - echo Installing Docker...
-      - apt-get install -y docker.io
   
   pre_build:
     commands:
