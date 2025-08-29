@@ -35,17 +35,17 @@ public class SecurityConfig {
         
         // Allow requests from localhost (common development ports)
         configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",  // React default
-            "http://localhost:4200",  // Angular default
-            "http://localhost:8080",  // Vue.js default
-            "http://localhost:5173",  // Vite default
-            "http://127.0.0.1:3000",
-            "http://127.0.0.1:4200",
-            "http://127.0.0.1:8080",
-            "http://127.0.0.1:5173",
-            "http://978358-capstone-team1.s3-website-us-west-2.amazonaws.com"
+//            "http://localhost:3000",  // React default
+//            "http://localhost:4200",  // Angular default
+//            "http://localhost:8080",  // Vue.js default
+//            "http://localhost:5173",  // Vite default
+//            "http://127.0.0.1:3000",
+//            "http://127.0.0.1:4200",
+//            "http://127.0.0.1:8080",
+//            "http://127.0.0.1:5173",
+//            "http://978358-capstone-team1.s3-website-us-west-2.amazonaws.com"
             // Temporarily allow all origins for development (REMOVE IN PRODUCTION!)
-            // "*"
+             "*"
         ));
         
         // Allow all HTTP methods

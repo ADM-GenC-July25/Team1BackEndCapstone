@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'ByteBazaar Spring Boot Application Infrastructure'
+
+Parameters:
+  ApplicationName:
+    Type: String
+    Default: 'bytebazaar'
+    Description: 'Name of the application'
+  
+  EnvironmentName:
+    Type: String
+    Default: 'production'
+    AllowedValues: ['development', 'staging', 'production']
+    Description: 'Environment name'
+
+Resources:
+  # Elastic Beanstalk Application
+  ByteBazaarApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Ref ApplicationName
+      Description: 'ByteBazaar Spring Boot Application'
+
+  # Elastic Beanstalk Application Version
+  ByteBazaarApplicationVersion:
+    Type: AWS::ElasticBeanstalk::ApplicationVersion
+    Properties:
+      ApplicationName: !Ref ByteBazaarApplication
+      Description: 'Initial version'
+      SourceBundle:
+        S3Bucket: !Sub '${ApplicationName}-deployment-bucket'
+        S3Key: 'application.jar'
+
+  # Elastic Beanstalk Environment
+  ByteBazaarEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref ByteBazaarApplication
+      EnvironmentName: !Sub '${ApplicationName}-${EnvironmentName}'
+      SolutionStackName: '64bit Amazon Linux 2 v3.2.17 running Corretto 17'
+      VersionLabel: !Ref ByteBazaarApplicationVersion
+      OptionSettings:
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: 'InstanceType'
+          Value: 't3.micro'
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: 'EnvironmentType'
+          Value: 'LoadBalanced'
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'SPRING_PROFILES_ACTIVE'
+          Value: !Ref EnvironmentName
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'SERVER_PORT'
+          Value: '5000'
+
+  # S3 Bucket for deployments
+  DeploymentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ApplicationName}-deployment-bucket'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  ApplicationURL:
+    Description: 'URL of the Elastic Beanstalk environment'
+    Value: !GetAtt ByteBazaarEnvironment.EndpointURL
+    Export:
+      Name: !Sub '${AWS::StackName}-ApplicationURL'
+  
+  EnvironmentName:
+    Description: 'Name of the Elastic Beanstalk environment'
+    Value: !Ref ByteBazaarEnvironment
+    Export:
+      Name: !Sub '${AWS::StackName}-EnvironmentName'
